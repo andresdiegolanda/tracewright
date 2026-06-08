@@ -1,83 +1,91 @@
 /**
- * report.js — render a validation Report as a human-readable text summary (v1).
+ * report.js — render a validation Report as a Markdown summary (v1).
  *
- * Pure formatting over the Report produced by engine/validate.js. Per-beacon violations
- * (schema, ambiguous) are grouped under each beacon; cross-event violations (precedes,
- * count) are grouped under "Sequence". Unclassified beacons and skipped non-Adobe rows are
- * shown as non-failing notices.
+ * Pure formatting over the Report produced by engine/validate.js. The output is valid
+ * Markdown so it reads well in a terminal and can be pasted straight into a file. Per-beacon
+ * violations (schema, ambiguous) are grouped under each beacon; cross-event violations
+ * (precedes, count) are grouped under "Sequence rules". Unclassified beacons and skipped
+ * non-Adobe rows are listed as notices, and a summary table closes the report.
+ *
+ * The report is assembled from "blocks" — each helper returns an array of lines (or null
+ * when it has nothing to show). Blocks are joined with a blank line between them.
  */
-
-const PAD = 9; // align the violation-code column
 
 /**
  * @param {object} report  the Report from validate()
  * @param {{ skippedNonAdobe?: number }} [options]
- * @returns {string} a text report ending in a newline
+ * @returns {string} a Markdown report ending in a newline
  */
 export function formatReport(report, { skippedNonAdobe = 0 } = {}) {
-  const out = [];
-  const meta = new Map(report.classified.map((c) => [c.beacon, c]));
+  const blocks = [
+    headingBlock(report),
+    ...beaconBlocks(report),
+    sequenceBlock(report),
+    noticesBlock(report, skippedNonAdobe),
+    summaryBlock(report, skippedNonAdobe)
+  ].filter(Boolean);
 
-  const perBeacon = report.violations.filter((v) => v.code === 'schema' || v.code === 'ambiguous');
-  const sequence = report.violations.filter((v) => v.code === 'precedes' || v.code === 'count');
-  const violatedBeacons = [...new Set(report.violations.filter((v) => v.beacon != null).map((v) => v.beacon))]
-    .sort((a, b) => a - b);
-
-  // Heading
-  if (report.violations.length === 0) {
-    out.push(`tracewright — all ${report.summary.beacons} beacon${plural(report.summary.beacons)} OK`);
-  } else {
-    out.push(`tracewright — ${violatedBeacons.length} of ${report.summary.beacons} beacon${plural(report.summary.beacons)} have violations`);
-  }
-
-  // Per-beacon groups
-  for (const beacon of violatedBeacons) {
-    const c = meta.get(beacon) ?? {};
-    const where = c.requestId ? `request ${c.requestId}` : `index ${beacon}`;
-    const cls = c.type ? `classified as "${c.type}"` : 'unclassified';
-    out.push('');
-    out.push(`✗ Beacon #${beacon}  (${where})  ${cls}`);
-    for (const v of perBeacon.filter((x) => x.beacon === beacon)) {
-      out.push(`  • ${v.code.padEnd(PAD)} ${v.message}${gotSuffix(v)}`);
-    }
-  }
-
-  // Sequence group
-  if (sequence.length > 0) {
-    out.push('');
-    out.push('✗ Sequence');
-    for (const v of sequence) {
-      const loc = v.code === 'precedes' && v.beacon != null ? `  [#${v.beacon}]` : '';
-      out.push(`  • ${v.code.padEnd(PAD)} ${v.message}${loc}`);
-    }
-  }
-
-  // Non-failing notices
-  const notices = [];
-  for (const w of report.warnings) {
-    notices.push(`⚠ Beacon #${w.beacon} unclassified (no matching event type)${w.requestId ? ` — request ${w.requestId}` : ''}`);
-  }
-  if (skippedNonAdobe > 0) {
-    notices.push(`ℹ ${skippedNonAdobe} non-Adobe row${plural(skippedNonAdobe)} skipped`);
-  }
-  if (notices.length > 0) {
-    out.push('');
-    out.push(...notices);
-  }
-
-  // Summary
-  out.push('');
-  out.push(summaryLine(report, skippedNonAdobe));
-
-  return out.join('\n') + '\n';
+  return blocks.map((lines) => lines.join('\n')).join('\n\n') + '\n';
 }
 
-function summaryLine(report, skipped) {
+function headingBlock(report) {
+  const total = report.violations.length;
+  const { beacons } = report.summary;
+  const result = total === 0
+    ? `✅ All ${beacons} ${pluralize('beacon', beacons)} passed.`
+    : `❌ ${total} ${pluralize('violation', total)} found.`;
+  return ['# tracewright report', '', `**Rule set:** \`${report.ruleSet}\``, '', `**Result:** ${result}`];
+}
+
+function beaconBlocks(report) {
+  const meta = new Map(report.classified.map((c) => [c.beacon, c]));
+  const perBeacon = report.violations.filter((v) => v.code === 'schema' || v.code === 'ambiguous');
+  const beacons = [...new Set(perBeacon.map((v) => v.beacon))].sort((a, b) => a - b);
+  return beacons.map((beacon) => oneBeaconBlock(beacon, meta.get(beacon) ?? {}, perBeacon));
+}
+
+function oneBeaconBlock(beacon, info, perBeacon) {
+  const label = info.type ? `\`${info.type}\`` : 'unclassified';
+  const quote = info.requestId ? [`> request \`${info.requestId}\``, ''] : [];
+  const bullets = perBeacon
+    .filter((v) => v.beacon === beacon)
+    .map((v) => `- **${v.code}** — ${v.message}${gotSuffix(v)}`);
+  return [`## Beacon #${beacon} — ${label}`, '', ...quote, ...bullets];
+}
+
+function sequenceBlock(report) {
+  const seq = report.violations.filter((v) => v.code === 'precedes' || v.code === 'count');
+  if (seq.length === 0) return null;
+  const bullets = seq.map((v) => {
+    const loc = v.code === 'precedes' && v.beacon != null ? ` (beacon #${v.beacon})` : '';
+    return `- **${v.code}** — ${v.message}${loc}`;
+  });
+  return ['## Sequence rules', '', ...bullets];
+}
+
+function noticesBlock(report, skipped) {
+  const warnings = report.warnings.map((w) => {
+    const where = w.requestId ? ` — request \`${w.requestId}\`` : '';
+    return `- ⚠️ Beacon #${w.beacon} unclassified (no matching event type)${where}`;
+  });
+  const skippedLine = skipped > 0 ? [`- ℹ️ ${skipped} non-Adobe ${pluralize('row', skipped)} skipped`] : [];
+  const bullets = [...warnings, ...skippedLine];
+  return bullets.length === 0 ? null : ['## Notices', '', ...bullets];
+}
+
+function summaryBlock(report, skipped) {
   const s = report.summary;
-  const breakdown = formatTally(report.violations);
-  const head = `Summary: ${s.violations} violation${plural(s.violations)}` + (breakdown ? ` (${breakdown})` : '');
-  const tail = `${s.ok} OK, ${s.unclassified} unclassified` + (skipped ? `, ${skipped} skipped` : '');
-  return `${head}. ${tail}.`;
+  const total = report.violations.length;
+  const violations = total === 0 ? '0' : `${total} (${formatTally(report.violations)})`;
+  const rows = [
+    ['Beacons checked', s.beacons],
+    ['Passed', s.ok],
+    ['Unclassified', s.unclassified],
+    ...(skipped > 0 ? [['Non-Adobe skipped', skipped]] : []),
+    ['Violations', violations]
+  ];
+  const tableRows = rows.map(([metric, count]) => `| ${metric} | ${count} |`);
+  return ['## Summary', '', '| Metric | Count |', '| --- | --- |', ...tableRows];
 }
 
 function formatTally(violations) {
@@ -89,9 +97,9 @@ function formatTally(violations) {
 function gotSuffix(v) {
   if (v.code !== 'schema') return '';
   if (v.actual === null || v.actual === undefined || typeof v.actual === 'object') return '';
-  return ` (got: ${JSON.stringify(v.actual)})`;
+  return ` (got: \`${JSON.stringify(v.actual)}\`)`;
 }
 
-function plural(n) {
-  return n === 1 ? '' : 's';
+function pluralize(word, n) {
+  return n === 1 ? word : `${word}s`;
 }

@@ -13,13 +13,15 @@ const cleanReport = {
   violations: []
 };
 
-test('a clean report announces all beacons OK', () => {
+test('a clean report announces all beacons passed and renders a summary table', () => {
   const text = formatReport(cleanReport);
-  assert.match(text, /all 2 beacons OK/);
-  assert.match(text, /Summary: 0 violations\. 2 OK, 0 unclassified\./);
+  assert.match(text, /^# tracewright report$/m);
+  assert.match(text, /\*\*Result:\*\* ✅ All 2 beacons passed\./);
+  assert.match(text, /\| Beacons checked \| 2 \|/);
+  assert.match(text, /\| Violations \| 0 \|/);
 });
 
-test('schema violations group under their beacon with a got-suffix', () => {
+test('schema violations group under a beacon heading with a got-suffix', () => {
   const report = {
     ruleSet: 'rs',
     summary: { beacons: 2, ok: 1, unclassified: 0, violations: 2 },
@@ -34,14 +36,15 @@ test('schema violations group under their beacon with a got-suffix', () => {
     ]
   };
   const text = formatReport(report);
-  assert.match(text, /1 of 2 beacons have violations/);
-  assert.match(text, /✗ Beacon #1 {2}\(request r1\) {2}classified as "purchase"/);
-  assert.match(text, /required field missing: "cc"/);
-  assert.match(text, /must not be empty \(got: ""\)/); // value violation shows actual
-  assert.ok(!/required field missing: "cc" \(got/.test(text)); // required (actual null) has no got-suffix
+  assert.match(text, /\*\*Result:\*\* ❌ 2 violations found\./);
+  assert.match(text, /## Beacon #1 — `purchase`/);
+  assert.match(text, /> request `r1`/);
+  assert.match(text, /- \*\*schema\*\* — required field missing: "cc"/);
+  assert.match(text, /- \*\*schema\*\* — field "products" must not be empty \(got: `""`\)/);
+  assert.ok(!/missing: "cc" \(got/.test(text)); // required (actual null) has no got-suffix
 });
 
-test('sequence violations group under Sequence with a precedes locator', () => {
+test('sequence violations group under Sequence rules with a precedes locator', () => {
   const report = {
     ruleSet: 'rs',
     summary: { beacons: 2, ok: 1, unclassified: 0, violations: 2 },
@@ -53,12 +56,13 @@ test('sequence violations group under Sequence with a precedes locator', () => {
     ]
   };
   const text = formatReport(report);
-  assert.match(text, /✗ Sequence/);
-  assert.match(text, /precedes {2}A purchase must be preceded by an add-to-cart\. {2}\[#0\]/);
-  assert.match(text, /count {5}"purchase" must occur at most 1, got 2/);
+  assert.match(text, /## Sequence rules/);
+  assert.match(text, /- \*\*precedes\*\* — A purchase must be preceded by an add-to-cart\. \(beacon #0\)/);
+  assert.match(text, /- \*\*count\*\* — "purchase" must occur at most 1, got 2/);
+  assert.match(text, /\| Violations \| 2 \(1 precedes, 1 count\) \|/);
 });
 
-test('unclassified warnings and skipped rows appear as non-failing notices', () => {
+test('unclassified warnings and skipped rows appear as notices', () => {
   const report = {
     ruleSet: 'rs',
     summary: { beacons: 1, ok: 0, unclassified: 1, violations: 0 },
@@ -67,7 +71,9 @@ test('unclassified warnings and skipped rows appear as non-failing notices', () 
     violations: []
   };
   const text = formatReport(report, { skippedNonAdobe: 2 });
-  assert.match(text, /⚠ Beacon #0 unclassified \(no matching event type\) — request r0/);
-  assert.match(text, /ℹ 2 non-Adobe rows skipped/);
-  assert.match(text, /0 OK, 1 unclassified, 2 skipped\./);
+  assert.match(text, /## Notices/);
+  assert.match(text, /- ⚠️ Beacon #0 unclassified \(no matching event type\) — request `r0`/);
+  assert.match(text, /- ℹ️ 2 non-Adobe rows skipped/);
+  assert.match(text, /\| Unclassified \| 1 \|/);
+  assert.match(text, /\| Non-Adobe skipped \| 2 \|/);
 });

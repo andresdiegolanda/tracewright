@@ -330,7 +330,7 @@ import { loadRuleSet, readExport, validate, formatReport } from 'tracewright';
 const ruleSet = await loadRuleSet('./examples/rule-sets/ecommerce-checkout.json');
 const events  = readExport(csvText);     // Omnibug CSV → NormalizedEvent[]
 const report  = validate(events, ruleSet); // pure: (events, ruleSet) -> Report
-process.stdout.write(formatReport(report)); // text
+process.stdout.write(formatReport(report)); // Markdown
 ```
 
 `validate` runs three passes into one `Report`:
@@ -344,28 +344,51 @@ process.stdout.write(formatReport(report)); // text
 
 ---
 
-## 8. Report format (v1: text)
+## 8. Report format (v1: Markdown text)
 
+The report is Markdown — readable in a terminal and pasteable straight into a file.
+Per-beacon violations group under a beacon heading; cross-event violations group under
+"Sequence rules"; unclassified beacons and skipped non-Adobe rows are notices; a summary
+table closes the report.
+
+```markdown
+# tracewright report
+
+**Rule set:** `example-ecommerce-checkout`
+
+**Result:** ❌ 3 violations found.
+
+## Beacon #3 — `purchase`
+
+> request `7f3a`
+
+- **schema** — required field missing: "cc"
+- **schema** — field "products" must not be empty (got: `""`)
+
+## Sequence rules
+
+- **precedes** — A purchase must be preceded by at least one add-to-cart. (beacon #3)
+
+## Notices
+
+- ⚠️ Beacon #1 unclassified (no matching event type) — request `9b21`
+- ℹ️ 1 non-Adobe row skipped
+
+## Summary
+
+| Metric | Count |
+| --- | --- |
+| Beacons checked | 5 |
+| Passed | 1 |
+| Unclassified | 1 |
+| Non-Adobe skipped | 1 |
+| Violations | 3 (2 schema, 1 precedes) |
 ```
-tracewright — 2 of 5 beacons have violations
 
-✗ Beacon #3  (request 7f3a, 12:04:51)  classified as "purchase"
-  • schema    required field missing: "cc"
-  • schema    field "products" must not be empty (got: "")
-
-✗ Sequence
-  • precedes  "purchase" at #3 has no preceding "addToCart"
-              rule: A purchase must be preceded by at least one add-to-cart.
-
-⚠ 1 beacon unclassified (no matching event type) — request 9b21, image ping. Skipped.
-
-Summary: 3 violations across 2 beacons (2 schema, 1 sequence). 2 beacons OK, 1 unclassified.
-```
-
-Each violation carries: a stable `code` (`schema` / `precedes` / `count`), the locating
-context (beacon index + request id + timestamp, or "Sequence"), the offending field, the
-author's `message` when present, and expected-vs-actual. Unclassified beacons appear as
-warnings and never fail the run.
+Each violation carries: a stable `code` (`schema` / `precedes` / `count` / `ambiguous`), the
+locating context (beacon index + request id, or the Sequence section), the offending field,
+the author's `message` when present, and expected-vs-actual. Unclassified beacons appear as
+notices and never fail the run.
 
 v1 prints text to stdout and returns a non-zero exit code **only** for operational failures
 (unreadable rule set or export). A violations-based exit code for CI gating, and JSON

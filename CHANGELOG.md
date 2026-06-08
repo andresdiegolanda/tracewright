@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- The report is now Markdown — beacon headings, grouped violation lists, a notices section, and a summary table — so it reads more clearly in a terminal and can be pasted straight into a file. The result line now states the total violation count (which also fixes the confusing "0 of N beacons" heading when only a sequence rule failed).
+
 ### Added
 - Project scaffold: ESM package manifest, MIT license, README, and the `tracewright` design document.
 - Generic validation engine, with no hardcoded event taxonomy:

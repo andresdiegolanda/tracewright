@@ -40,19 +40,39 @@ Try it against the bundled synthetic example:
 node src/cli.js --rules examples/rule-sets/ecommerce-checkout.json examples/captures/checkout.csv
 ```
 
-```
-tracewright — all 4 beacons OK
+The report is Markdown, so it reads well in the terminal and can be pasted straight into a
+file:
 
-ℹ 1 non-Adobe row skipped
+```markdown
+# tracewright report
 
-Summary: 0 violations. 4 OK, 0 unclassified, 1 skipped.
+**Rule set:** `example-ecommerce-checkout`
+
+**Result:** ✅ All 4 beacons passed.
+
+## Notices
+
+- ℹ️ 1 non-Adobe row skipped
+
+## Summary
+
+| Metric | Count |
+| --- | --- |
+| Beacons checked | 4 |
+| Passed | 4 |
+| Unclassified | 0 |
+| Non-Adobe skipped | 1 |
+| Violations | 0 |
 ```
 
 A capture with problems reports each one under its beacon:
 
-```
-✗ Beacon #4  (request 26030)  classified as "addToCart"
-  • schema    required field missing: "cc"
+```markdown
+## Beacon #2 — `addToCart`
+
+> request `3703`
+
+- **schema** — field "cc" must be one of ["USD","EUR","GBP"] (got: `"JPY"`)
 ```
 
 To produce your own capture: open `beacon-emitter.html` in a browser, click through the
