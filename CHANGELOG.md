@@ -19,3 +19,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Human-readable text report and a command-line interface (`tracewright --rules <file> <export.csv>`).
 - Synthetic example rule set and capture, plus a standalone `beacon-emitter.html` test-data generator — all invented against public Adobe documentation, with no real-world data.
 - README section explaining how to install dependencies and run the test suite.
+- `make-rule-set` example skill (`examples/skills/`) that turns a plain-language Markdown event spec into a rule-set JSON file, documenting the design's authoring loop without adding anything to the engine.
