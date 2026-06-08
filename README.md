@@ -34,7 +34,29 @@ npm install
 tracewright --rules <rule-set.json> <omnibug-export.csv>
 ```
 
-(CLI wiring lands later in v1 — see the design doc's scope section.)
+Try it against the bundled synthetic example:
+
+```sh
+node src/cli.js --rules examples/rule-sets/ecommerce-checkout.json examples/captures/checkout.csv
+```
+
+```
+tracewright — all 4 beacons OK
+
+ℹ 1 non-Adobe row skipped
+
+Summary: 0 violations. 4 OK, 0 unclassified, 1 skipped.
+```
+
+A capture with problems reports each one under its beacon:
+
+```
+✗ Beacon #4  (request 26030)  classified as "addToCart"
+  • schema    required field missing: "cc"
+```
+
+To produce your own capture: open `beacon-emitter.html` in a browser, click through the
+flow with Omnibug recording, and export Omnibug's capture as CSV.
 
 ## Documentation
 
