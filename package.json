@@ -2,7 +2,26 @@
   "name": "tracewright",
   "version": "0.1.0",
   "description": "Validate Adobe Analytics beacons from an Omnibug CSV export against a configurable rule set.",
+  "keywords": [
+    "adobe-analytics",
+    "omnibug",
+    "beacon",
+    "web-analytics",
+    "tracking",
+    "validation",
+    "cli",
+    "qa"
+  ],
+  "homepage": "https://github.com/andresdiegolanda/tracewright#readme",
+  "bugs": {
+    "url": "https://github.com/andresdiegolanda/tracewright/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andresdiegolanda/tracewright.git"
+  },
   "license": "MIT",
+  "author": "Andrés Landa",
   "type": "module",
   "bin": {
     "tracewright": "src/cli.js"
