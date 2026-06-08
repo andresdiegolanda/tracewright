@@ -6,6 +6,7 @@ coverage/
 # Local tooling / editor state
 .claude/
 
-# Local real captures must never be committed (synthetic-only repo, see docs/design.md §9.2)
-/test0.csv
+# Genuinely-real captures must never be committed (synthetic-only repo, see docs/design.md §9.2).
+# Synthetic captures (e.g. test0.csv from beacon-emitter.html) ARE committed.
+/*.real.csv
 /*.local.csv
