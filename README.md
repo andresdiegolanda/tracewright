@@ -30,8 +30,10 @@ npm install
 
 ## Usage
 
+From a fresh clone (after `npm install`), run the CLI with Node:
+
 ```sh
-tracewright --rules <rule-set.json> <omnibug-export.csv>
+node src/cli.js --rules <rule-set.json> <omnibug-export.csv>
 ```
 
 Try it against the bundled synthetic example:
@@ -39,6 +41,10 @@ Try it against the bundled synthetic example:
 ```sh
 node src/cli.js --rules examples/rule-sets/ecommerce-checkout.json examples/captures/checkout.csv
 ```
+
+To get a bare `tracewright` command on your `PATH`, link the package once with `npm link`
+(then `tracewright --rules <rule-set.json> <omnibug-export.csv>` works), or run it ad hoc
+with `npx tracewright --rules <...>`.
 
 By default the report is plain text:
 
