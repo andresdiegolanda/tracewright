@@ -78,7 +78,7 @@ node --test test/decode.test.js
 ## Documentation
 
 - [docs/design.md](docs/design.md) — architecture, rule-set format, engine interface, scope
-- [docs/rule-set-format.md](docs/rule-set-format.md) — authoring reference *(planned)*
+- [docs/rule-set-format.md](docs/rule-set-format.md) — how to author a rule set (with the `make-rule-set` skill)
 - [docs/request-format.md](docs/request-format.md) — Adobe/Omnibug request format + citations *(planned)*
 
 ## License
