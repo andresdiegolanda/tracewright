@@ -47,6 +47,6 @@ test('the beacon-emitter session surfaces the two deliberately cc-less add-to-ca
   assert.deepEqual(ccMissing.map((v) => v.beacon).sort((a, b) => a - b), [4, 5]);
 
   const text = formatReport(report, { skippedNonAdobe: skipped }); // default format (text)
-  assert.match(text, /2 of 6 beacons have violations/);
+  assert.match(text, /2 violations found/);
   assert.match(text, /required field missing: "cc"/);
 });

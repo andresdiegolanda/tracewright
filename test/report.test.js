@@ -108,7 +108,7 @@ test('text format: beacon line shows request id and timestamp, with code bullets
     ]
   };
   const text = formatReport(report, { format: 'text' });
-  assert.match(text, /tracewright — 1 of 2 beacons have violations/);
+  assert.match(text, /tracewright — 2 violations found/);
   assert.match(text, /✗ Beacon #1 {2}\(request 7f3a, 12:04:51\) {2}classified as "purchase"/);
   assert.match(text, /^ {2}• schema {4}required field missing: "cc"$/m);
   assert.match(text, /^ {2}• schema {4}field "products" must not be empty \(got: ""\)$/m); // no backticks in text
@@ -126,6 +126,21 @@ test('text format: sequence violations group under a plain Sequence heading', ()
     ]
   };
   const text = formatReport(report, { format: 'text' });
+  // sequence-only violations must not read as a clean pass in the headline
+  assert.match(text, /^tracewright — 1 violation found$/m);
   assert.match(text, /^✗ Sequence$/m);
   assert.match(text, /^ {2}• count {5}"purchase" must occur at most 1, got 2$/m);
+});
+
+test('text header agrees in number for a single beacon', () => {
+  const oneClean = { ...cleanReport, summary: { beacons: 1, ok: 1, unclassified: 0, violations: 0 }, classified: [cleanReport.classified[0]] };
+  assert.match(formatReport(oneClean, { format: 'text' }), /^tracewright — all 1 beacon OK$/m);
+  const oneViolation = formatReport({
+    ruleSet: 'rs',
+    summary: { beacons: 1, ok: 0, unclassified: 0, violations: 1 },
+    classified: [{ beacon: 0, requestId: 'r0', timestamp: null, type: 'purchase' }],
+    warnings: [],
+    violations: [{ code: 'schema', beacon: 0, requestId: 'r0', eventType: 'purchase', field: 'cc', message: 'required field missing: "cc"', expected: 'present', actual: null }]
+  }, { format: 'text' });
+  assert.match(oneViolation, /^tracewright — 1 violation found$/m);
 });

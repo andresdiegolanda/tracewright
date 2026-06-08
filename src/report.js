@@ -99,7 +99,7 @@ function mdSummaryBlock(report, skipped) {
 function formatText(report, skipped) {
   const { meta, perBeacon, sequence, violatedBeacons } = partition(report);
   const blocks = [
-    [textHeading(report, violatedBeacons)],
+    [textHeading(report)],
     ...violatedBeacons.map((b) => textBeaconBlock(b, meta.get(b) ?? {}, perBeacon)),
     textSequenceBlock(sequence),
     textNoticesBlock(report, skipped),
@@ -108,12 +108,15 @@ function formatText(report, skipped) {
   return blocks.map((lines) => lines.join('\n')).join('\n\n') + '\n';
 }
 
-function textHeading(report, violatedBeacons) {
+function textHeading(report) {
   const { beacons } = report.summary;
-  if (report.violations.length === 0) {
+  const total = report.violations.length;
+  if (total === 0) {
     return `tracewright — all ${beacons} ${pluralize('beacon', beacons)} OK`;
   }
-  return `tracewright — ${violatedBeacons.length} of ${beacons} ${pluralize('beacon', beacons)} have violations`;
+  // Count all violations (including sequence/count rules not tied to a beacon) so the
+  // headline never reads as a clean pass, and the wording stays grammatical for any count.
+  return `tracewright — ${total} ${pluralize('violation', total)} found`;
 }
 
 function textBeaconBlock(beacon, info, perBeacon) {
