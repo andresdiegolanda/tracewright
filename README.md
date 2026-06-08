@@ -95,6 +95,27 @@ To run a single file:
 node --test test/decode.test.js
 ```
 
+### End-to-end tests
+
+Three suites run the whole pipeline (read CSV → validate → report) against the bundled
+synthetic fixtures:
+
+- `test/e2e.test.js` — runs the example rule set against the clean example capture and
+  `test0.csv`, checking both the violations and the rendered report.
+- `test/captures.test.js` — runs the example rule set against every example capture,
+  asserting the expected outcome for each (clean, schema, sequence, unclassified).
+- `test/cross-rule-set.test.js` — runs **two contrasting rule sets** against the same
+  captures. Captures that fail the strict `ecommerce-checkout` rules pass under the
+  permissive `minimal-presence` rules, with no change to any engine code. This is the
+  executable proof of the rules-as-data design: validation behaviour comes from the rule
+  set, not the engine.
+
+Run just the end-to-end suites:
+
+```sh
+node --test test/e2e.test.js test/captures.test.js test/cross-rule-set.test.js
+```
+
 ## Documentation
 
 - [docs/design.md](docs/design.md) — architecture, rule-set format, engine interface, scope

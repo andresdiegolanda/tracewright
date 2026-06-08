@@ -1,0 +1,22 @@
+{
+  "name": "minimal-presence",
+  "description": "A deliberately permissive rule set: it only checks that each event carries its key fields — no allowed-value rules and no ordering. Paired with example-ecommerce-checkout, it demonstrates that validation behaviour is driven entirely by the rule set, not the engine. Synthetic (see docs/design.md §9.2).",
+  "eventTypes": {
+    "pageView": {
+      "identify": { "param": "pageName", "matches": "^home$" },
+      "schema": { "type": "object", "required": ["pageName"] }
+    },
+    "productView": {
+      "identify": { "param": "events", "contains": "prodView" },
+      "schema": { "type": "object", "required": ["pageName"] }
+    },
+    "addToCart": {
+      "identify": { "param": "events", "contains": "scAdd" },
+      "schema": { "type": "object", "required": ["products"] }
+    },
+    "purchase": {
+      "identify": { "param": "events", "matches": "purchase" },
+      "schema": { "type": "object", "required": ["products"] }
+    }
+  }
+}
