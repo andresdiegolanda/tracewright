@@ -9,7 +9,7 @@
  *   {
  *     ruleSet: string,
  *     summary: { beacons, ok, unclassified, violations },
- *     classified: Array<{ beacon, requestId, type }>,
+ *     classified: Array<{ beacon, requestId, timestamp, type }>,
  *     warnings:   Array<{ code:'unclassified', beacon, requestId, message }>,
  *     violations: Array<Violation>   // schema | precedes | count | ambiguous
  *   }
@@ -80,6 +80,7 @@ export function validate(events, ruleSet) {
     classified: classified.map((c) => ({
       beacon: c.event.index,
       requestId: c.event.requestId ?? null,
+      timestamp: c.event.timestamp ?? null,
       type: c.type
     })),
     warnings,

@@ -23,10 +23,13 @@ Usage:
   tracewright --rules <rule-set.json> <omnibug-export.csv>
 
 Options:
-  -r, --rules <path>   Rule-set JSON file (required)
-  -h, --help           Show this help
+  -r, --rules <path>      Rule-set JSON file (required)
+  -f, --format <fmt>      Report format: markdown (default) or text
+  -h, --help              Show this help
 
 Reads the CSV export, validates its Adobe beacons against the rule set, and prints a report.`;
+
+const FORMATS = new Set(['markdown', 'text']);
 
 async function main(argv) {
   let parsed;
@@ -36,6 +39,7 @@ async function main(argv) {
       allowPositionals: true,
       options: {
         rules: { type: 'string', short: 'r' },
+        format: { type: 'string', short: 'f' },
         help: { type: 'boolean', short: 'h' }
       }
     });
@@ -55,6 +59,11 @@ async function main(argv) {
   }
   if (positionals.length > 1) {
     return fail(`expected a single export file, got ${positionals.length}`);
+  }
+
+  const format = values.format ?? 'markdown';
+  if (!FORMATS.has(format)) {
+    return fail(`unknown format "${format}" (expected markdown or text)`);
   }
 
   let csvText;
@@ -81,7 +90,7 @@ async function main(argv) {
     return fail(err.message);
   }
 
-  process.stdout.write(formatReport(report, { skippedNonAdobe: skipped }));
+  process.stdout.write(formatReport(report, { format, skippedNonAdobe: skipped }));
   return 0;
 }
 

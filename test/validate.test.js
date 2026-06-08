@@ -103,7 +103,7 @@ test('classified summary records the resolved type per beacon', () => {
   ];
   const report = validate(events, ruleSet);
   assert.deepEqual(report.classified, [
-    { beacon: 0, requestId: 'r0', type: 'addToCart' },
-    { beacon: 1, requestId: 'r1', type: null }
+    { beacon: 0, requestId: 'r0', timestamp: null, type: 'addToCart' },
+    { beacon: 1, requestId: 'r1', timestamp: null, type: null }
   ]);
 });

@@ -46,7 +46,7 @@ nothing is lost — just deferred.
   `sequence` list using two rule kinds: **`precedes`** and **`count`**.
 - Rule-set document **meta-validated on load** via Ajv against a published meta-schema.
 - Pipeline: **classify → schema → sequence**.
-- **Text** report to stdout.
+- **Markdown** (default) or **text** report to stdout, selectable with `--format`.
 - Unclassified beacons → **warning**, not failure.
 
 **Deferred to v2+ (see §10):** TAB-delimited input, a friendly-name field map, structured
@@ -77,7 +77,7 @@ flowchart TD
         validate["validate.js — orchestrates the above"]
     end
 
-    report["report.js — text report"]
+    report["report.js — Markdown (default) or text report"]
 
     read -->|"raw records"| engine
     engine -->|Report| report
@@ -330,7 +330,7 @@ import { loadRuleSet, readExport, validate, formatReport } from 'tracewright';
 const ruleSet = await loadRuleSet('./examples/rule-sets/ecommerce-checkout.json');
 const events  = readExport(csvText);     // Omnibug CSV → NormalizedEvent[]
 const report  = validate(events, ruleSet); // pure: (events, ruleSet) -> Report
-process.stdout.write(formatReport(report)); // Markdown
+process.stdout.write(formatReport(report, { format: 'markdown' })); // 'markdown' (default) | 'text'
 ```
 
 `validate` runs three passes into one `Report`:
@@ -344,12 +344,21 @@ process.stdout.write(formatReport(report)); // Markdown
 
 ---
 
-## 8. Report format (v1: Markdown text)
+## 8. Report format (v1)
 
-The report is Markdown — readable in a terminal and pasteable straight into a file.
-Per-beacon violations group under a beacon heading; cross-event violations group under
-"Sequence rules"; unclassified beacons and skipped non-Adobe rows are notices; a summary
-table closes the report.
+The report comes in two formats, chosen with the CLI's `--format` (`-f`) flag, or
+`formatReport(report, { format })`:
+
+- **`markdown`** (the **default**) — beacon headings, grouped violation lists, a notices
+  section, and a summary table. Reads well in a terminal and pastes straight into a file.
+- **`text`** — the compact `✗ Beacon … • code message` form with a one-line summary.
+  Cleaner for plain terminal output / piping.
+
+Both render the same grouping: per-beacon violations (schema, ambiguous) under each beacon;
+cross-event violations (precedes, count) under a sequence group; unclassified beacons and
+skipped non-Adobe rows as notices.
+
+**Markdown (default):**
 
 ```markdown
 # tracewright report
@@ -385,14 +394,31 @@ table closes the report.
 | Violations | 3 (2 schema, 1 precedes) |
 ```
 
-Each violation carries: a stable `code` (`schema` / `precedes` / `count` / `ambiguous`), the
-locating context (beacon index + request id, or the Sequence section), the offending field,
-the author's `message` when present, and expected-vs-actual. Unclassified beacons appear as
-notices and never fail the run.
+**Text (`--format text`):**
 
-v1 prints text to stdout and returns a non-zero exit code **only** for operational failures
-(unreadable rule set or export). A violations-based exit code for CI gating, and JSON
-output, are v2 (§10).
+```
+tracewright — 1 of 5 beacons have violations
+
+✗ Beacon #3  (request 7f3a, 12:04:51)  classified as "purchase"
+  • schema    required field missing: "cc"
+  • schema    field "products" must not be empty (got: "")
+
+✗ Sequence
+  • precedes  A purchase must be preceded by at least one add-to-cart. (beacon #3)
+
+⚠ Beacon #1 unclassified (no matching event type) — request 9b21
+ℹ 1 non-Adobe row skipped
+
+Summary: 3 violations (2 schema, 1 precedes). 1 OK, 1 unclassified, 1 skipped.
+```
+
+Each violation carries: a stable `code` (`schema` / `precedes` / `count` / `ambiguous`), the
+locating context (beacon index + request id + timestamp, or the Sequence group), the
+offending field, the author's `message` when present, and expected-vs-actual. Unclassified
+beacons appear as notices and never fail the run.
+
+v1 returns a non-zero exit code **only** for operational failures (unreadable rule set or
+export). A violations-based exit code for CI gating, and JSON output, are v2 (§10).
 
 ---
 

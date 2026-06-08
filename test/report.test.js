@@ -77,3 +77,49 @@ test('unclassified warnings and skipped rows appear as notices', () => {
   assert.match(text, /\| Unclassified \| 1 \|/);
   assert.match(text, /\| Non-Adobe skipped \| 2 \|/);
 });
+
+/* ---- text format (--format text) ---- */
+
+test('text format: clean report uses the original one-line summary', () => {
+  const text = formatReport(cleanReport, { format: 'text' });
+  assert.match(text, /^tracewright — all 2 beacons OK$/m);
+  assert.match(text, /^Summary: 0 violations\. 2 OK, 0 unclassified\.$/m);
+  assert.ok(!/^#/m.test(text)); // no Markdown headings
+});
+
+test('text format: beacon line shows request id and timestamp, with code bullets', () => {
+  const report = {
+    ruleSet: 'rs',
+    summary: { beacons: 2, ok: 1, unclassified: 0, violations: 2 },
+    classified: [
+      { beacon: 0, requestId: 'r0', timestamp: '12:00:00', type: 'addToCart' },
+      { beacon: 1, requestId: '7f3a', timestamp: '12:04:51', type: 'purchase' }
+    ],
+    warnings: [],
+    violations: [
+      { code: 'schema', beacon: 1, requestId: '7f3a', eventType: 'purchase', field: 'cc', message: 'required field missing: "cc"', expected: 'present', actual: null },
+      { code: 'schema', beacon: 1, requestId: '7f3a', eventType: 'purchase', field: 'products', message: 'field "products" must not be empty', expected: 'minLength 1', actual: '' }
+    ]
+  };
+  const text = formatReport(report, { format: 'text' });
+  assert.match(text, /tracewright — 1 of 2 beacons have violations/);
+  assert.match(text, /✗ Beacon #1 {2}\(request 7f3a, 12:04:51\) {2}classified as "purchase"/);
+  assert.match(text, /^ {2}• schema {4}required field missing: "cc"$/m);
+  assert.match(text, /^ {2}• schema {4}field "products" must not be empty \(got: ""\)$/m); // no backticks in text
+  assert.match(text, /Summary: 2 violations \(2 schema\)\. 1 OK, 0 unclassified\./);
+});
+
+test('text format: sequence violations group under a plain Sequence heading', () => {
+  const report = {
+    ruleSet: 'rs',
+    summary: { beacons: 3, ok: 3, unclassified: 0, violations: 1 },
+    classified: [{ beacon: 0, requestId: 'r0', timestamp: null, type: 'purchase' }],
+    warnings: [],
+    violations: [
+      { code: 'count', beacon: null, requestId: null, eventType: 'purchase', field: null, message: '"purchase" must occur at most 1, got 2', expected: 'at most 1', actual: 2 }
+    ]
+  };
+  const text = formatReport(report, { format: 'text' });
+  assert.match(text, /^✗ Sequence$/m);
+  assert.match(text, /^ {2}• count {5}"purchase" must occur at most 1, got 2$/m);
+});
