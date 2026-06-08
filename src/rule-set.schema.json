@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tracewright.dev/rule-set.schema.json",
+  "title": "tracewright rule set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "eventTypes"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "eventTypes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/eventType" }
+    },
+    "sequence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sequenceRule" }
+    }
+  },
+  "$defs": {
+    "eventType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identify", "schema"],
+      "properties": {
+        "description": { "type": "string" },
+        "identify": { "$ref": "#/$defs/matcher" },
+        "schema": { "type": "object" }
+      }
+    },
+
+    "matcher": {
+      "oneOf": [
+        { "$ref": "#/$defs/predicate" },
+        { "$ref": "#/$defs/allMatcher" },
+        { "$ref": "#/$defs/anyMatcher" },
+        { "$ref": "#/$defs/notMatcher" }
+      ]
+    },
+    "predicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["param"],
+      "properties": {
+        "param": { "type": "string", "minLength": 1 },
+        "equals": { "type": "string" },
+        "contains": { "type": "string" },
+        "matches": { "type": "string" },
+        "exists": { "type": "boolean" }
+      },
+      "oneOf": [
+        { "required": ["equals"] },
+        { "required": ["contains"] },
+        { "required": ["matches"] },
+        { "required": ["exists"] }
+      ]
+    },
+    "allMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["all"],
+      "properties": {
+        "all": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/matcher" } }
+      }
+    },
+    "anyMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["any"],
+      "properties": {
+        "any": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/matcher" } }
+      }
+    },
+    "notMatcher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["not"],
+      "properties": {
+        "not": { "$ref": "#/$defs/matcher" }
+      }
+    },
+
+    "sequenceRule": {
+      "oneOf": [
+        { "$ref": "#/$defs/precedesRule" },
+        { "$ref": "#/$defs/countRule" }
+      ]
+    },
+    "precedesRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "before", "after"],
+      "properties": {
+        "rule": { "const": "precedes" },
+        "before": { "type": "string", "minLength": 1 },
+        "after": { "type": "string", "minLength": 1 },
+        "message": { "type": "string" }
+      }
+    },
+    "countRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "event"],
+      "anyOf": [
+        { "required": ["exactly"] },
+        { "required": ["min"] },
+        { "required": ["max"] }
+      ],
+      "properties": {
+        "rule": { "const": "count" },
+        "event": { "type": "string", "minLength": 1 },
+        "exactly": { "type": "integer", "minimum": 0 },
+        "min": { "type": "integer", "minimum": 0 },
+        "max": { "type": "integer", "minimum": 0 },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}
