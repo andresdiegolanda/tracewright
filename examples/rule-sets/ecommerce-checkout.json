@@ -1,0 +1,67 @@
+{
+  "name": "example-ecommerce-checkout",
+  "description": "Illustrative checkout flow for a fictional store. Entirely synthetic — no real report suites, event names, or values (see docs/design.md §9.2).",
+  "eventTypes": {
+    "pageView": {
+      "description": "A standard page view (home).",
+      "identify": { "param": "pageName", "equals": "home" },
+      "schema": {
+        "type": "object",
+        "required": ["pageName"],
+        "properties": {
+          "pageName": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "productView": {
+      "description": "Product detail view.",
+      "identify": { "param": "events", "contains": "prodView" },
+      "schema": {
+        "type": "object",
+        "required": ["pageName", "products"],
+        "properties": {
+          "pageName": { "type": "string", "pattern": "^product:" },
+          "products": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "addToCart": {
+      "description": "Add to cart.",
+      "identify": { "param": "events", "contains": "scAdd" },
+      "schema": {
+        "type": "object",
+        "required": ["products", "cc"],
+        "properties": {
+          "cc": { "enum": ["USD", "EUR", "GBP"] },
+          "products": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "purchase": {
+      "description": "Order confirmation.",
+      "identify": { "param": "events", "contains": "purchase" },
+      "schema": {
+        "type": "object",
+        "required": ["products", "cc", "v1"],
+        "properties": {
+          "cc": { "enum": ["USD", "EUR", "GBP"] },
+          "products": { "type": "string", "minLength": 1 },
+          "v1": { "type": "string", "pattern": "^ORD-" }
+        }
+      }
+    }
+  },
+  "sequence": [
+    {
+      "rule": "precedes",
+      "before": "addToCart",
+      "after": "purchase",
+      "message": "A purchase must be preceded by at least one add-to-cart."
+    },
+    {
+      "rule": "count",
+      "event": "purchase",
+      "max": 1
+    }
+  ]
+}
