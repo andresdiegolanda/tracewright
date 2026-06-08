@@ -29,8 +29,8 @@ test('the clean example capture validates with no violations', async () => {
   assert.deepEqual(report.violations, []);
   assert.equal(report.summary.unclassified, 0);
 
-  const text = formatReport(report, { skippedNonAdobe: skipped });
-  assert.match(text, /✅ All 4 beacons passed\./);
+  const text = formatReport(report, { skippedNonAdobe: skipped }); // default format (text)
+  assert.match(text, /all 4 beacons OK/);
   assert.match(text, /1 non-Adobe row skipped/);
 });
 
@@ -46,7 +46,7 @@ test('the beacon-emitter session surfaces the two deliberately cc-less add-to-ca
   assert.equal(ccMissing.length, 2); // beacons #4 and #5
   assert.deepEqual(ccMissing.map((v) => v.beacon).sort((a, b) => a - b), [4, 5]);
 
-  const text = formatReport(report, { skippedNonAdobe: skipped });
-  assert.match(text, /❌ 2 violations found\./);
+  const text = formatReport(report, { skippedNonAdobe: skipped }); // default format (text)
+  assert.match(text, /2 of 6 beacons have violations/);
   assert.match(text, /required field missing: "cc"/);
 });

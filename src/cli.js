@@ -24,7 +24,7 @@ Usage:
 
 Options:
   -r, --rules <path>      Rule-set JSON file (required)
-  -f, --format <fmt>      Report format: markdown (default) or text
+  -f, --format <fmt>      Report format: text (default) or markdown
   -h, --help              Show this help
 
 Reads the CSV export, validates its Adobe beacons against the rule set, and prints a report.`;
@@ -61,7 +61,7 @@ async function main(argv) {
     return fail(`expected a single export file, got ${positionals.length}`);
   }
 
-  const format = values.format ?? 'markdown';
+  const format = values.format ?? 'text';
   if (!FORMATS.has(format)) {
     return fail(`unknown format "${format}" (expected markdown or text)`);
   }

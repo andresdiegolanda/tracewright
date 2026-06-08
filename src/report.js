@@ -2,10 +2,10 @@
  * report.js — render a validation Report as either Markdown (default) or plain text.
  *
  * Pure formatting over the Report produced by engine/validate.js.
- *   - Markdown (default): beacon headings, grouped violation lists, a notices section, and a
- *     summary table. Reads well in a terminal and pastes straight into a file.
- *   - Text: the compact `✗ Beacon #N … classified as "X"` form with `• code message` bullets
- *     and a one-line summary. Cleaner for plain terminal output.
+ *   - Text (default): the compact `✗ Beacon #N … classified as "X"` form with `• code
+ *     message` bullets and a one-line summary. Clean for plain terminal output.
+ *   - Markdown: beacon headings, grouped violation lists, a notices section, and a summary
+ *     table. Reads well in a terminal and pastes straight into a file.
  *
  * Both renderers share the same grouping (partition): per-beacon violations (schema,
  * ambiguous) under each beacon; cross-event violations (precedes, count) under a sequence
@@ -16,10 +16,10 @@ const CODE_WIDTH = 9; // align the code column in the text renderer
 
 /**
  * @param {object} report  the Report from validate()
- * @param {{ format?: 'markdown'|'text', skippedNonAdobe?: number }} [options]
+ * @param {{ format?: 'text'|'markdown', skippedNonAdobe?: number }} [options]
  * @returns {string} the report, ending in a newline
  */
-export function formatReport(report, { format = 'markdown', skippedNonAdobe = 0 } = {}) {
+export function formatReport(report, { format = 'text', skippedNonAdobe = 0 } = {}) {
   return format === 'text' ? formatText(report, skippedNonAdobe) : formatMarkdown(report, skippedNonAdobe);
 }
 

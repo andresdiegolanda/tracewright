@@ -14,7 +14,7 @@ const cleanReport = {
 };
 
 test('a clean report announces all beacons passed and renders a summary table', () => {
-  const text = formatReport(cleanReport);
+  const text = formatReport(cleanReport, { format: 'markdown' });
   assert.match(text, /^# tracewright report$/m);
   assert.match(text, /\*\*Result:\*\* ✅ All 2 beacons passed\./);
   assert.match(text, /\| Beacons checked \| 2 \|/);
@@ -35,7 +35,7 @@ test('schema violations group under a beacon heading with a got-suffix', () => {
       { code: 'schema', beacon: 1, requestId: 'r1', eventType: 'purchase', field: 'products', message: 'field "products" must not be empty', expected: 'minLength 1', actual: '' }
     ]
   };
-  const text = formatReport(report);
+  const text = formatReport(report, { format: 'markdown' });
   assert.match(text, /\*\*Result:\*\* ❌ 2 violations found\./);
   assert.match(text, /## Beacon #1 — `purchase`/);
   assert.match(text, /> request `r1`/);
@@ -55,7 +55,7 @@ test('sequence violations group under Sequence rules with a precedes locator', (
       { code: 'count', beacon: null, requestId: null, eventType: 'purchase', field: null, message: '"purchase" must occur at most 1, got 2', expected: 'at most 1', actual: 2 }
     ]
   };
-  const text = formatReport(report);
+  const text = formatReport(report, { format: 'markdown' });
   assert.match(text, /## Sequence rules/);
   assert.match(text, /- \*\*precedes\*\* — A purchase must be preceded by an add-to-cart\. \(beacon #0\)/);
   assert.match(text, /- \*\*count\*\* — "purchase" must occur at most 1, got 2/);
@@ -70,7 +70,7 @@ test('unclassified warnings and skipped rows appear as notices', () => {
     warnings: [{ code: 'unclassified', beacon: 0, requestId: 'r0', message: 'no matching event type' }],
     violations: []
   };
-  const text = formatReport(report, { skippedNonAdobe: 2 });
+  const text = formatReport(report, { format: 'markdown', skippedNonAdobe: 2 });
   assert.match(text, /## Notices/);
   assert.match(text, /- ⚠️ Beacon #0 unclassified \(no matching event type\) — request `r0`/);
   assert.match(text, /- ℹ️ 2 non-Adobe rows skipped/);
@@ -78,7 +78,13 @@ test('unclassified warnings and skipped rows appear as notices', () => {
   assert.match(text, /\| Non-Adobe skipped \| 2 \|/);
 });
 
-/* ---- text format (--format text) ---- */
+/* ---- text format (the default) ---- */
+
+test('text is the default format', () => {
+  const def = formatReport(cleanReport);
+  assert.equal(def, formatReport(cleanReport, { format: 'text' }));
+  assert.ok(!/^#/m.test(def)); // not Markdown
+});
 
 test('text format: clean report uses the original one-line summary', () => {
   const text = formatReport(cleanReport, { format: 'text' });

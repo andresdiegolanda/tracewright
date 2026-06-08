@@ -46,7 +46,7 @@ nothing is lost — just deferred.
   `sequence` list using two rule kinds: **`precedes`** and **`count`**.
 - Rule-set document **meta-validated on load** via Ajv against a published meta-schema.
 - Pipeline: **classify → schema → sequence**.
-- **Markdown** (default) or **text** report to stdout, selectable with `--format`.
+- **Text** (default) or **Markdown** report to stdout, selectable with `--format`.
 - Unclassified beacons → **warning**, not failure.
 
 **Deferred to v2+ (see §10):** TAB-delimited input, a friendly-name field map, structured
@@ -77,7 +77,7 @@ flowchart TD
         validate["validate.js — orchestrates the above"]
     end
 
-    report["report.js — Markdown (default) or text report"]
+    report["report.js — text (default) or Markdown report"]
 
     read -->|"raw records"| engine
     engine -->|Report| report
@@ -330,7 +330,7 @@ import { loadRuleSet, readExport, validate, formatReport } from 'tracewright';
 const ruleSet = await loadRuleSet('./examples/rule-sets/ecommerce-checkout.json');
 const events  = readExport(csvText);     // Omnibug CSV → NormalizedEvent[]
 const report  = validate(events, ruleSet); // pure: (events, ruleSet) -> Report
-process.stdout.write(formatReport(report, { format: 'markdown' })); // 'markdown' (default) | 'text'
+process.stdout.write(formatReport(report)); // 'text' (default); pass { format: 'markdown' } for Markdown
 ```
 
 `validate` runs three passes into one `Report`:
@@ -349,16 +349,16 @@ process.stdout.write(formatReport(report, { format: 'markdown' })); // 'markdown
 The report comes in two formats, chosen with the CLI's `--format` (`-f`) flag, or
 `formatReport(report, { format })`:
 
-- **`markdown`** (the **default**) — beacon headings, grouped violation lists, a notices
-  section, and a summary table. Reads well in a terminal and pastes straight into a file.
-- **`text`** — the compact `✗ Beacon … • code message` form with a one-line summary.
-  Cleaner for plain terminal output / piping.
+- **`text`** (the **default**) — the compact `✗ Beacon … • code message` form with a
+  one-line summary. Clean for plain terminal output / piping.
+- **`markdown`** — beacon headings, grouped violation lists, a notices section, and a
+  summary table. Reads well in a terminal and pastes straight into a file.
 
 Both render the same grouping: per-beacon violations (schema, ambiguous) under each beacon;
 cross-event violations (precedes, count) under a sequence group; unclassified beacons and
 skipped non-Adobe rows as notices.
 
-**Markdown (default):**
+**Markdown (`--format markdown`):**
 
 ```markdown
 # tracewright report
@@ -394,7 +394,7 @@ skipped non-Adobe rows as notices.
 | Violations | 3 (2 schema, 1 precedes) |
 ```
 
-**Text (`--format text`):**
+**Text (default):**
 
 ```
 tracewright — 1 of 5 beacons have violations

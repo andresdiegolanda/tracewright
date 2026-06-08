@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- The CLI's default report format is now **text** (was Markdown); pass `--format markdown` (`-f markdown`) for the Markdown report.
+
 ## [0.1.0] - 2026-06-08
 
 First release. A generic engine that validates Adobe Analytics beacons from an Omnibug CSV
