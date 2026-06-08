@@ -77,8 +77,11 @@ file — beacon headings, grouped violations, and a summary table:
 | Violations | 0 |
 ```
 
-To produce your own capture: open `beacon-emitter.html` in a browser, click through the
-flow with Omnibug recording, and export Omnibug's capture as CSV.
+To produce your own capture, use the bundled generator
+[examples/beacon-emitter.html](examples/beacon-emitter.html): open it in a browser with
+Omnibug recording, click through the flow, and export Omnibug's capture as CSV. It is a
+standalone, dependency-free page that fires fictional Adobe-shaped beacons (no real account,
+report suite, or server); see its on-page "How to use it" section for the full walkthrough.
 
 ## Running the tests
 
@@ -123,6 +126,13 @@ node --test test/e2e.test.js test/captures.test.js test/cross-rule-set.test.js
 - [docs/design.md](docs/design.md) — architecture, rule-set format, engine interface, scope
 - [docs/rule-set-format.md](docs/rule-set-format.md) — how to author a rule set (with the `make-rule-set` skill)
 - [docs/request-format.md](docs/request-format.md) — Adobe/Omnibug request format + citations *(planned)*
+
+### Examples
+
+- [examples/beacon-emitter.html](examples/beacon-emitter.html) — a standalone page that fires fictional Adobe beacons for Omnibug to capture, so you can generate your own synthetic CSV exports (open it in a browser; it explains its own usage)
+- [examples/rule-sets/](examples/rule-sets/) — synthetic rule sets (`ecommerce-checkout`, `minimal-presence`)
+- [examples/captures/](examples/captures/) — synthetic Omnibug CSV exports covering clean and failing cases
+- [examples/skills/make-rule-set/](examples/skills/make-rule-set/SKILL.md) — a skill that turns a plain-language event spec into a rule set
 
 ## License
 

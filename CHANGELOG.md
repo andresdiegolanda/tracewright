@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 - The CLI's default report format is now **text** (was Markdown); pass `--format markdown` (`-f markdown`) for the Markdown report.
+- Moved `beacon-emitter.html` from the repo root into `examples/`, added an on-page "How to use it" walkthrough, and documented it in the README and design doc.
 
 ## [0.1.0] - 2026-06-08
 

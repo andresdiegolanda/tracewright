@@ -42,6 +42,12 @@
   .empty { color:var(--muted); padding:14px; font-style:italic; }
   .hint { color:var(--muted); font-size:12px; margin:10px 0 0; }
   code { font:12px var(--mono); color:#cdd7f0; }
+  a { color:var(--accent); }
+  .howto { margin-top:16px; }
+  .howto h2 { margin-top:0; }
+  .howto p { color:var(--muted); margin:0 0 10px; }
+  ol.steps { margin:0; padding-left:20px; }
+  ol.steps li { color:var(--muted); margin:5px 0; }
 </style>
 </head>
 <body>
@@ -86,6 +92,32 @@
     <div class="empty" id="empty">No beacons fired yet — click a button (a “View page” beacon fires on load).</div>
   </div>
   <p class="hint">Then in Omnibug: capture, and export as CSV for use as a synthetic fixture.</p>
+
+  <section class="card howto">
+    <h2>What this is &amp; how to use it</h2>
+    <p>
+      <code>beacon-emitter.html</code> is a local, dependency-free test-data generator for
+      <b>tracewright</b>. It fires Adobe-Analytics-shaped tracking pixels so the open-source
+      <a href="https://omnibug.io">Omnibug</a> browser extension captures them; you export
+      Omnibug's capture as CSV and hand that file to tracewright. Everything it emits is
+      fictional — no Adobe account, report suite, or server is involved, and the pixel
+      requests are <i>expected to fail to load</i> (Omnibug intercepts them by URL shape
+      before that matters).
+    </p>
+    <ol class="steps">
+      <li>Install the <b>Omnibug</b> extension and open its panel (browser DevTools → Omnibug).</li>
+      <li>Open this file in the same browser. A <i>View page</i> beacon fires automatically on load.</li>
+      <li>Click the storefront buttons to fire <code>pageView</code>, <code>productView</code>,
+          <code>addToCart</code>, and <code>purchase</code> beacons. Use the test-only extras to
+          produce a beacon missing <code>cc</code> and a non-Adobe request.</li>
+      <li>Confirm each click in the log above — it shows the exact URL fired (also visible in Omnibug).</li>
+      <li>In Omnibug, <b>export</b> the captured requests as <b>CSV</b>.</li>
+      <li>Validate the export:
+          <code>tracewright --rules &lt;rule-set.json&gt; &lt;export.csv&gt;</code>
+          (see <code>examples/rule-sets/</code> for rule sets, or author one with the
+          <code>make-rule-set</code> skill).</li>
+    </ol>
+  </section>
 
 <script>
   // ---- Fictional identifiers. Nothing real. ----

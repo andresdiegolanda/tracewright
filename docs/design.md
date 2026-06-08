@@ -447,18 +447,13 @@ tracewright/
       schema.js                 Ajv wiring, error → Violation mapping
       sequence.js               precedes / count evaluators
       validate.js               orchestration → Report
-    report.js                   text renderer
+    report.js                   text (default) + Markdown renderers
   examples/
-    rule-sets/
-      ecommerce-checkout.json   fictional, generic
-    captures/
-      checkout.csv              a small synthetic Omnibug CSV export
-  test/
-    decode.test.js
-    classify.test.js
-    schema.test.js
-    sequence.test.js
-    fixtures/
+    beacon-emitter.html         synthetic Adobe-beacon generator (open in a browser)
+    rule-sets/                  fictional rule sets (ecommerce-checkout, minimal-presence)
+    captures/                   synthetic Omnibug CSV exports (clean + failing cases)
+    skills/make-rule-set/       skill: plain-language event spec → rule set
+  test/                         unit tests per module + end-to-end suites
 ```
 
 Dependencies, minimal and justified:
