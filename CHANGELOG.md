@@ -18,3 +18,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Omnibug CSV export reader: skips the metadata line, maps columns by the header row, tolerates rows shorter than the header, and counts-and-skips non-Adobe rows.
 - Human-readable text report and a command-line interface (`tracewright --rules <file> <export.csv>`).
 - Synthetic example rule set and capture, plus a standalone `beacon-emitter.html` test-data generator — all invented against public Adobe documentation, with no real-world data.
+- README section explaining how to install dependencies and run the test suite.

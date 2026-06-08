@@ -58,6 +58,23 @@ A capture with problems reports each one under its beacon:
 To produce your own capture: open `beacon-emitter.html` in a browser, click through the
 flow with Omnibug recording, and export Omnibug's capture as CSV.
 
+## Running the tests
+
+The test suite uses Node's built-in test runner (`node:test`) — no test framework to install.
+
+```sh
+npm install   # one-time, installs ajv + ajv-formats
+npm test      # runs node --test over test/
+```
+
+`npm test` discovers every `test/*.test.js` file and exercises the engine modules, the CSV
+reader, the report renderer, and an end-to-end run against the bundled synthetic fixtures.
+To run a single file:
+
+```sh
+node --test test/decode.test.js
+```
+
 ## Documentation
 
 - [docs/design.md](docs/design.md) — architecture, rule-set format, engine interface, scope
