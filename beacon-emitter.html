@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beacon Emitter — synthetic Adobe Analytics test data</title>
+<style>
+  :root { --bg:#0f1320; --card:#1a2032; --ink:#e8ecf5; --muted:#9aa6c2;
+          --accent:#4f8cff; --warn:#f0a83a; --bad:#ff5d6c; --ok:#3ad29f;
+          --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif;
+         background:var(--bg); color:var(--ink); padding:20px; }
+  h1 { font-size:18px; margin:0 0 2px; }
+  .sub { color:var(--muted); margin:0 0 16px; font-size:13px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+  .card { background:var(--card); border:1px solid #28304a; border-radius:10px; padding:14px; }
+  .card h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em;
+             color:var(--muted); margin:0 0 10px; }
+  .products { list-style:none; margin:0 0 12px; padding:0; }
+  .products li { display:flex; justify-content:space-between; padding:4px 0;
+                 border-bottom:1px dashed #28304a; color:var(--muted); }
+  .products li b { color:var(--ink); font-weight:600; }
+  .btns { display:flex; flex-wrap:wrap; gap:8px; }
+  button { font:inherit; cursor:pointer; border:1px solid #39456a; border-radius:8px;
+           padding:8px 12px; background:#222a42; color:var(--ink); }
+  button:hover { background:#2a3454; }
+  button.accent { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.warn   { border-color:var(--warn); color:var(--warn); }
+  button.bad    { border-color:var(--bad);  color:var(--bad);  }
+  .log { background:#0b0f1a; border:1px solid #28304a; border-radius:10px;
+         padding:0; margin-top:16px; max-height:46vh; overflow:auto; }
+  .log .row { display:grid; grid-template-columns:64px 90px 1fr; gap:10px;
+              padding:8px 12px; border-bottom:1px solid #161d30; align-items:baseline; }
+  .log .row:first-child { background:#10182b; }
+  .log .t { color:var(--muted); font:12px var(--mono); }
+  .tag { font:11px/1.6 var(--mono); text-transform:uppercase; letter-spacing:.05em;
+         padding:1px 7px; border-radius:20px; text-align:center; }
+  .tag.adobe { background:rgba(58,210,159,.12); color:var(--ok); }
+  .tag.non   { background:rgba(154,166,194,.14); color:var(--muted); }
+  .url { font:12px/1.5 var(--mono); word-break:break-all; color:#cdd7f0; }
+  .empty { color:var(--muted); padding:14px; font-style:italic; }
+  .hint { color:var(--muted); font-size:12px; margin:10px 0 0; }
+  code { font:12px var(--mono); color:#cdd7f0; }
+</style>
+</head>
+<body>
+  <h1>Beacon Emitter</h1>
+  <p class="sub">
+    A fictional storefront that fires Adobe-shaped tracking pixels for capture by Omnibug.
+    Everything here is invented — fake host, fake report suite, fake products.
+    Requests are expected to fail to load; only their URL shape matters.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Fictional Store — “Widgetorium”</h2>
+      <ul class="products">
+        <li><b>Widget</b><span>$9.99</span></li>
+        <li><b>Gadget</b><span>$14.50</span></li>
+        <li><b>Sprocket</b><span>$3.25</span></li>
+      </ul>
+      <div class="btns">
+        <button onclick="viewPage()">View page</button>
+        <button onclick="viewProduct()">View product</button>
+        <button class="accent" onclick="addToCart()">Add to cart</button>
+        <button class="accent" onclick="purchase()">Purchase</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Test-only extras</h2>
+      <div class="btns">
+        <button class="warn" onclick="addToCartNoCC()">Add to cart — missing <code>cc</code></button>
+        <button class="bad"  onclick="nonAdobePing()">Non-Adobe image ping</button>
+      </div>
+      <p class="hint">
+        The <b>missing-cc</b> beacon exercises a required-field rule later.
+        The <b>non-Adobe ping</b> has no <code>/b/ss/</code> path, so Omnibug (and
+        tracewright) should treat it as a non-Adobe / unclassified beacon.
+      </p>
+    </div>
+  </div>
+
+  <div class="log" id="log">
+    <div class="empty" id="empty">No beacons fired yet — click a button (a “View page” beacon fires on load).</div>
+  </div>
+  <p class="hint">Then in Omnibug: capture, and export as CSV for use as a synthetic fixture.</p>
+
+<script>
+  // ---- Fictional identifiers. Nothing real. ----
+  const HOST = 'fictionalstore.sc.omtrdc.net';   // fake Adobe-style collection host
+  const RSID = 'fictionalstore-prod';            // fake report suite id
+
+  // Build an Adobe /b/ss/ beacon URL from a param map.
+  function adobeUrl(params) {
+    const cacheBuster = 's' + Math.floor(Math.random() * 1e13);
+    const qs = new URLSearchParams();
+    qs.set('AQB', '1');          // Adobe Query Begin sentinel (realism; harmless)
+    qs.set('ndh', '1');
+    for (const [k, v] of Object.entries(params)) qs.set(k, v);
+    qs.set('AQE', '1');          // Adobe Query End sentinel
+    return `https://${HOST}/b/ss/${RSID}/1/${cacheBuster}?${qs.toString()}`;
+  }
+
+  // Fire a tracking pixel. Cross-origin load failure is expected and fine.
+  function fire(url, isAdobe) {
+    new Image().src = url;
+    logRow(url, isAdobe);
+  }
+
+  // ---- Storefront beacons ----
+  function viewPage() {
+    fire(adobeUrl({ pageName: 'home', g: location.href }), true);
+  }
+  function viewProduct() {
+    fire(adobeUrl({ pageName: 'product:widget', events: 'prodView', products: ';Widget;;' }), true);
+  }
+  function addToCart() {
+    fire(adobeUrl({ events: 'scAdd', products: ';Widget;1;9.99', cc: 'USD' }), true);
+  }
+  function purchase() {
+    const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+    fire(adobeUrl({ events: 'purchase', products: ';Widget;1;9.99', cc: 'USD', v1: orderId }), true);
+  }
+
+  // ---- Test-only extras ----
+  function addToCartNoCC() {
+    fire(adobeUrl({ events: 'scAdd', products: ';Widget;1;9.99' }), true);  // deliberately no cc
+  }
+  function nonAdobePing() {
+    const url = `https://cdn.fictionalstore.example/pixel.gif?ping=1&cb=${Math.floor(Math.random() * 1e9)}`;
+    fire(url, false);  // plain image, no /b/ss/ path → not an Adobe beacon
+  }
+
+  // ---- Visible log ----
+  function logRow(url, isAdobe) {
+    const empty = document.getElementById('empty');
+    if (empty) empty.remove();
+    const now = new Date().toLocaleTimeString();
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML =
+      `<span class="t"></span>` +
+      `<span class="tag ${isAdobe ? 'adobe' : 'non'}">${isAdobe ? 'Adobe' : 'non-Adobe'}</span>` +
+      `<span class="url"></span>`;
+    row.children[0].textContent = now;
+    row.children[2].textContent = url;
+    const log = document.getElementById('log');
+    log.insertBefore(row, log.firstChild);   // newest on top
+  }
+
+  // Fire a page-view beacon on load, as requested.
+  window.addEventListener('load', viewPage);
+</script>
+</body>
+</html>

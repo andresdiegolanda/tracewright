@@ -1,0 +1,31 @@
+{
+  "name": "tracewright",
+  "version": "0.1.0",
+  "description": "Validate Adobe Analytics beacons from an Omnibug CSV export against a configurable rule set.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "tracewright": "src/cli.js"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "docs",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules/
+*.log
+.DS_Store
+coverage/
+
+# Local tooling / editor state
+.claude/
+
+# Local real captures must never be committed (synthetic-only repo, see docs/design.md §9.2)
+/test0.csv
+/*.local.csv
