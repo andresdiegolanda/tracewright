@@ -1,0 +1,8 @@
+"Omnibug v2.1.0","Exported Mon Jun 08 2026 18:50:00 GMT+0100 (Irish Standard Time)"
+"Event Type","Provider","Account","Request ID","Request URL","POST Data","Timestamp","Notes"
+"Navigation","","","","https://widgetorium.example/","","Mon Jun 08 2026 18:50:00 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3001","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3001?AQB=1&ndh=1&pageName=home&g=https%3A%2F%2Fwidgetorium.example%2F&AQE=1","","Mon Jun 08 2026 18:50:01 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3002","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3002?AQB=1&ndh=1&pageName=product%3Awidget&events=prodView&products=%3BWidget%3B%3B&AQE=1","","Mon Jun 08 2026 18:50:02 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3003","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3003?AQB=1&ndh=1&events=scAdd&products=%3BWidget%3B1%3B9.99&cc=USD&AQE=1","","Mon Jun 08 2026 18:50:03 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3004","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3004?AQB=1&ndh=1&events=scAdd&products=%3BWidget%3B1%3B9.99&cc=USD&AQE=1","","Mon Jun 08 2026 18:50:04 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3005","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3005?AQB=1&ndh=1&events=purchase&products=%3BWidget%3B1%3B9.99&cc=USD&v1=ORD-100200&AQE=1","","Mon Jun 08 2026 18:50:05 GMT+0100 (Irish Standard Time)"

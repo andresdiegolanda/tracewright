@@ -1,0 +1,4 @@
+"Omnibug v2.1.0","Exported Mon Jun 08 2026 18:53:00 GMT+0100 (Irish Standard Time)"
+"Event Type","Provider","Account","Request ID","Request URL","POST Data","Timestamp","Notes"
+"Page View","Adobe Analytics","fictionalstore-prod","3301","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3301?AQB=1&ndh=1&events=scAdd&products=%3BWidget%3B1%3B9.99&cc=USD&AQE=1","","Mon Jun 08 2026 18:53:01 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3302","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3302?AQB=1&ndh=1&events=purchase&products=%3BWidget%3B1%3B9.99&cc=USD&v1=12345&AQE=1","","Mon Jun 08 2026 18:53:02 GMT+0100 (Irish Standard Time)"

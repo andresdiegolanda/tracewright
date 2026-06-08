@@ -1,0 +1,6 @@
+"Omnibug v2.1.0","Exported Mon Jun 08 2026 18:56:00 GMT+0100 (Irish Standard Time)"
+"Event Type","Provider","Account","Request ID","Request URL","POST Data","Timestamp","Notes"
+"Navigation","","","","https://widgetorium.example/","","Mon Jun 08 2026 18:56:00 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3601","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3601?AQB=1&ndh=1&pageName=home&g=https%3A%2F%2Fwidgetorium.example%2F&AQE=1","","Mon Jun 08 2026 18:56:01 GMT+0100 (Irish Standard Time)"
+"Beacon","Other Provider","other-acct","3602","https://cdn.partner.example/track?id=42&ev=view","","Mon Jun 08 2026 18:56:02 GMT+0100 (Irish Standard Time)"
+"Page View","Adobe Analytics","fictionalstore-prod","3603","https://fictionalstore.sc.omtrdc.net/b/ss/fictionalstore-prod/1/s3603?AQB=1&ndh=1&events=event99&AQE=1","","Mon Jun 08 2026 18:56:03 GMT+0100 (Irish Standard Time)"

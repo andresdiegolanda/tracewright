@@ -21,3 +21,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - README section explaining how to install dependencies and run the test suite.
 - `make-rule-set` example skill (`examples/skills/`) that turns a plain-language Markdown event spec into a rule-set JSON file, documenting the design's authoring loop without adding anything to the engine.
 - `docs/rule-set-format.md` — a didactic guide to authoring a rule set via the `make-rule-set` skill, mapping plain-English event descriptions to identify matchers, JSON Schema, and sequence rules.
+- More synthetic example captures exercising each validation path (missing/invalid currency, bad order id, purchase without a cart, duplicate purchase, an unclassified beacon, and a mixed-error capture), with a data-driven test that runs every capture against the example rule set.
