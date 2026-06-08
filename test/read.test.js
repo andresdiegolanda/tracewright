@@ -74,8 +74,8 @@ test('readExport throws when there is no Omnibug header row', () => {
   assert.throws(() => readExport('"just","some","csv"\n"1","2","3"'), /Not an Omnibug CSV export/);
 });
 
-test('readExport reads the committed synthetic fixture test0.csv', async () => {
-  const path = fileURLToPath(new URL('../test0.csv', import.meta.url));
+test('readExport reads the synthetic beacon-emitter session fixture', async () => {
+  const path = fileURLToPath(new URL('../examples/captures/beacon-emitter-session.csv', import.meta.url));
   const { events, skipped } = readExport(await readFile(path, 'utf8'));
   assert.equal(events.length, 6); // six Adobe beacons
   assert.equal(skipped, 1); // one Navigation row

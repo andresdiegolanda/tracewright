@@ -34,9 +34,9 @@ test('the clean example capture validates with no violations', async () => {
   assert.match(text, /1 non-Adobe row skipped/);
 });
 
-test('test0.csv surfaces the two deliberately cc-less add-to-carts', async () => {
+test('the beacon-emitter session surfaces the two deliberately cc-less add-to-carts', async () => {
   const ruleSet = await loadRuleSet(fixture(RULES));
-  const { events, skipped } = readExport(await readFile(fixture('../test0.csv'), 'utf8'));
+  const { events, skipped } = readExport(await readFile(fixture('../examples/captures/beacon-emitter-session.csv'), 'utf8'));
   const report = validate(events, ruleSet);
 
   assert.equal(events.length, 6);
